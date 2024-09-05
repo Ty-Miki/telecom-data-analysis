@@ -6,6 +6,7 @@ from unittest.mock import patch, mock_open, Mock
 from scripts.utils import load_environment_variables
 from scripts.utils import connect_to_database
 from scripts.utils import load_data_from_db
+from scripts.utils import close_database_connection
 
 # Mock the dotenv_values function to simulate different scenarios
 @patch('scripts.utils.dotenv_values')
@@ -80,3 +81,21 @@ def test_load_data_from_db_failure(mock_read_sql_query):
     
     assert result is None
     mock_read_sql_query.assert_called_once_with(f"SELECT * FROM {table_name}", mock_conn)
+
+def test_close_database_connection_success():
+    mock_conn = Mock()
+    
+    close_database_connection(mock_conn)
+    
+    mock_conn.close.assert_called_once()
+    # Since close() is void, we just need to ensure it was called
+
+@patch('scripts.utils.logging.error')
+def test_close_database_connection_failure(mock_logging_error):
+    mock_conn = Mock()
+    mock_conn.close.side_effect = Exception("Close error")
+    
+    close_database_connection(mock_conn)
+    
+    mock_conn.close.assert_called_once()
+    mock_logging_error.assert_called_once_with("Error closing database connection: Close error")

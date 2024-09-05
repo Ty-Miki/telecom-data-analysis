@@ -52,4 +52,10 @@ def load_data_from_db(conn: Connection, table_name: str) -> pd.DataFrame | None:
     except Exception as e:
         logger.error(f"Error loading data from table '{table_name}': {str(e)}")
         return None
-    
+
+def close_database_connection(conn: Connection) -> None:
+    try:
+        conn.close()
+        logging.info("Database connection closed successfully")
+    except Exception as e:
+        logging.error(f"Error closing database connection: {str(e)}")
