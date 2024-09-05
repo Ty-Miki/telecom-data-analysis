@@ -1,9 +1,11 @@
 import pytest
 import psycopg2
+import pandas as pd
 from unittest.mock import patch, mock_open, Mock
 
 from scripts.utils import load_environment_variables
 from scripts.utils import connect_to_database
+from scripts.utils import load_data_from_db
 
 # Mock the dotenv_values function to simulate different scenarios
 @patch('scripts.utils.dotenv_values')
@@ -53,3 +55,28 @@ def test_connect_to_database_failure(mock_connect):
     
     assert result is None
     mock_connect.assert_called_once_with(**db_parameters)
+
+# Mock the pandas read_sql_query method
+@patch('scripts.utils.pd.read_sql_query')
+def test_load_data_from_db_success(mock_read_sql_query):
+    mock_df = pd.DataFrame({'column1': [1, 2], 'column2': ['A', 'B']})
+    mock_read_sql_query.return_value = mock_df
+    
+    mock_conn = Mock()
+    table_name = 'test_table'
+    result = load_data_from_db(mock_conn, table_name)
+    
+    assert isinstance(result, pd.DataFrame)
+    assert result.equals(mock_df)
+    mock_read_sql_query.assert_called_once_with(f"SELECT * FROM {table_name}", mock_conn)
+
+@patch('scripts.utils.pd.read_sql_query')
+def test_load_data_from_db_failure(mock_read_sql_query):
+    mock_read_sql_query.side_effect = Exception("SQL error")
+    
+    mock_conn = Mock()
+    table_name = 'test_table'
+    result = load_data_from_db(mock_conn, table_name)
+    
+    assert result is None
+    mock_read_sql_query.assert_called_once_with(f"SELECT * FROM {table_name}", mock_conn)
