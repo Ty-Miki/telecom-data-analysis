@@ -1,6 +1,6 @@
 # Task 2 Summary: User Engagement Analysis
 
-In this task, you will measure and analyze customer engagement based on several metrics: session frequency, session duration, and total traffic (download and upload) per customer. By grouping users based on their engagement, you'll help identify where network resources should be concentrated.
+In this task, I will measure and analyze customer engagement based on several metrics: session frequency, session duration, and total traffic (download and upload) per customer. By grouping users based on their engagement, I will identify where network resources should be concentrated.
 
 ## Sub-tasks
 
