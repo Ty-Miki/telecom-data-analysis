@@ -6,6 +6,7 @@ from scripts.enagagement_utils import normalize_data
 from scripts.enagagement_utils import cluster_data
 from scripts.enagagement_utils import convert_bytes_to_gigabytes
 from scripts.enagagement_utils import convert_milliseconds_to_minutes
+from scripts.enagagement_utils import calculate_total_data_per_app
 
 def test_normalize_data_success():
     df = pd.DataFrame({
@@ -140,6 +141,67 @@ def test_convert_milliseconds_to_minutes_failure():
     })
 
     result = convert_milliseconds_to_minutes(df, 'TimeInMilliSeconds', 'TimeInHours')
+    
+    # Ensure the function returns None on failure
+    assert result is None
+
+def test_calculate_total_data_success():
+    # Sample DataFrame with downlink (DL) and uplink (UL) data for multiple applications
+    data = {
+        'MSISDN/Number': ['12345', '67890', '12345'],
+        'Social Media DL (Bytes)': [1000, 2000, 1500],
+        'Social Media UL (Bytes)': [500, 1000, 800],
+        'Google DL (Bytes)': [2000, 2500, 3000],
+        'Google UL (Bytes)': [1000, 1200, 1400],
+    }
+    df = pd.DataFrame(data)
+    
+    applications = ['Social Media', 'Google']
+    
+    # Call the function
+    result = calculate_total_data_per_app(df, applications)
+    
+    # Check that the result is a DataFrame
+    assert isinstance(result, pd.DataFrame)
+    
+    # Check that the new columns exist
+    assert 'Social Media Total Data (Bytes)' in result.columns
+    assert 'Google Total Data (Bytes)' in result.columns
+    
+    # Check that the grouping and summing is correct
+    expected_data = {
+        'MSISDN/Number': ['12345', '67890'],
+        'Social Media Total Data (Bytes)': [3800, 3000],  # 1000+500 + 1500+800 for '12345' and 2000+1000 for '67890'
+        'Google Total Data (Bytes)': [7400, 3700],  # 2000+1000 + 3000+1400 for '12345' and 2500+1200 for '67890'
+    }
+    expected_df = pd.DataFrame(expected_data)
+    
+    pd.testing.assert_frame_equal(result, expected_df)
+
+def test_calculate_total_data_missing_column():
+    # Sample DataFrame missing some columns
+    data = {
+        'MSISDN/Number': ['12345', '67890'],
+        'Social Media DL (Bytes)': [1000, 2000],
+    }
+    df = pd.DataFrame(data)
+    
+    applications = ['Social Media', 'Google']
+    
+    # Call the function and expect None because of missing columns
+    result = calculate_total_data_per_app(df, applications)
+    
+    # Ensure the function returns None on failure
+    assert result is None
+
+def test_calculate_total_data_empty_dataframe():
+    # Empty DataFrame
+    df = pd.DataFrame()
+    
+    applications = ['Social Media', 'Google']
+    
+    # Call the function and expect None because the DataFrame is empty
+    result = calculate_total_data_per_app(df, applications)
     
     # Ensure the function returns None on failure
     assert result is None

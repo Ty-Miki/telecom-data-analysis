@@ -65,3 +65,25 @@ def convert_milliseconds_to_minutes(df: pd.DataFrame, ms_column: str, min_column
     except Exception as e:
         logging.error(f"Error converting '{ms_column}' to minutes: {str(e)}")
         return None
+    
+import pandas as pd
+
+def calculate_total_data_per_app(df: pd.DataFrame, applications: list) -> pd.DataFrame | None:
+    try:
+        # Calculate total data for each application
+        for application in applications:
+            df[f'{application} Total Data (Bytes)'] = df[f'{application} DL (Bytes)'] + df[f'{application} UL (Bytes)']
+        
+        # Group by 'MSISDN/Number' and sum the total data for each application
+        relevant_df = df.groupby('MSISDN/Number')[[f'{application} Total Data (Bytes)' for application in applications]].sum().reset_index()
+        
+        logging.info("Total data calculation and grouping successful")
+        return relevant_df
+    
+    except KeyError as e:
+        logging.error(f"One or more columns not found in DataFrame: {str(e)}")
+        return None
+
+    except Exception as e:
+        logging.error(f"Error in calculating total data: {str(e)}")
+        return None
