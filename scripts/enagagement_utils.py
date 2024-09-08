@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 import numpy as np
+import matplotlib.pyplot as plt
 
 def normalize_data(df: pd.DataFrame) -> np.ndarray | None:
     try:
@@ -17,11 +18,11 @@ def normalize_data(df: pd.DataFrame) -> np.ndarray | None:
         logging.error(f"Error normalizing data: {str(e)}")
         return None
     
-def cluster_data(normalized_df: pd.DataFrame, n_clusters: int = 3) -> np.ndarray | None:
+def cluster_data(normalized_data: np.ndarray, n_clusters: int = 3) -> np.ndarray | None:
     try:
         # Run K-Means clustering
         kmeans = KMeans(n_clusters=n_clusters, random_state=0)
-        clusters = kmeans.fit_predict(normalized_df)
+        clusters = kmeans.fit_predict(normalized_data)
         logging.info("K-Means clustering successful, customers classified into three groups")
         
         return clusters
@@ -65,8 +66,7 @@ def convert_milliseconds_to_minutes(df: pd.DataFrame, ms_column: str, min_column
     except Exception as e:
         logging.error(f"Error converting '{ms_column}' to minutes: {str(e)}")
         return None
-    
-import pandas as pd
+
 
 def calculate_total_data_per_app(df: pd.DataFrame, applications: list) -> pd.DataFrame | None:
     try:
@@ -87,3 +87,32 @@ def calculate_total_data_per_app(df: pd.DataFrame, applications: list) -> pd.Dat
     except Exception as e:
         logging.error(f"Error in calculating total data: {str(e)}")
         return None
+
+def elbow_method(normalized_data: np.ndarray, max_k: int = 10) -> None:
+    
+    try:
+        if len(normalized_data) == 0:
+            raise ValueError("Input data is empty.")
+
+        inertia = []
+        k_values = range(1, max_k + 1)
+
+        for k in k_values:
+            kmeans = KMeans(n_clusters=k, random_state=0)
+            kmeans.fit(normalized_data)
+            inertia.append(kmeans.inertia_)
+
+        # Plot the inertia for each k value
+        plt.figure(figsize=(10, 6))
+        plt.plot(k_values, inertia, marker='o')
+        plt.title('Elbow Method for Optimal k')
+        plt.xlabel('Number of Clusters (k)')
+        plt.ylabel('Inertia')
+        plt.show()
+        logging.info("Elbow method executed successfully.")
+        
+    except ValueError as e:
+        logging.error(f"Value error: {str(e)}")
+
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")

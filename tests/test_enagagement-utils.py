@@ -7,6 +7,7 @@ from scripts.enagagement_utils import cluster_data
 from scripts.enagagement_utils import convert_bytes_to_gigabytes
 from scripts.enagagement_utils import convert_milliseconds_to_minutes
 from scripts.enagagement_utils import calculate_total_data_per_app
+from scripts.enagagement_utils import elbow_method
 
 def test_normalize_data_success():
     df = pd.DataFrame({
@@ -205,3 +206,15 @@ def test_calculate_total_data_empty_dataframe():
     
     # Ensure the function returns None on failure
     assert result is None
+
+def test_elbow_method_success():
+    # Generate sample normalized data
+    normalized_data = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+
+    try:
+        # Call the function
+        elbow_method(normalized_data, max_k=5)
+        # If no exception is raised, the test passes
+        assert True
+    except Exception:
+        assert False, "Function raised an exception unexpectedly."
