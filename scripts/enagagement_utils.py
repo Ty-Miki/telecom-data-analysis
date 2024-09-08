@@ -48,7 +48,26 @@ def convert_bytes_to_gigabytes(df: pd.DataFrame, bytes_column: str, gb_column: s
     except Exception as e:
         logging.error(f"Error converting '{bytes_column}' to gigabytes: {str(e)}")
         return None
+
+def convert_bytes_to_megabytes(df: pd.DataFrame, bytes_column: str, gb_column: str) -> pd.DataFrame | None:
     
+    try:
+        # Convert bytes to megabytes
+        df[gb_column] = df[bytes_column] / (1024 * 1024)
+
+        # Drop the original bytes column
+        df.drop(columns=[bytes_column], inplace=True)
+        logging.info(f"Conversion of '{bytes_column}' to megaytes in column '{gb_column}' successful")
+        return df
+
+    except KeyError as e:
+        logging.error(f"Column '{bytes_column}' not found in DataFrame: {str(e)}")
+        return None
+
+    except Exception as e:
+        logging.error(f"Error converting '{bytes_column}' to megabytes: {str(e)}")
+        return None 
+
 def convert_milliseconds_to_minutes(df: pd.DataFrame, ms_column: str, min_column: str) -> pd.DataFrame | None:
     try:
         # Convert seconds to hours
