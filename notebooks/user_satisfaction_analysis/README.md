@@ -15,7 +15,9 @@
 
 ### Regression model
 
-- In this subtask I will build a **regression model** to predict the satisfaction score of a customer based on engagement and experience data.
+- In this subtask I will train a **regression model** to predict the satisfaction score of a customer based on engagement and experience data.
+- I will first train a **L****inear Regression model** and I will evaluate using the *mean_squared_error* and *r2_score* metrics.
+  - If there is significant difference between test data and predicted data I will move on to other regression models like **Ridge** or **Random Forest Regression**.
 
 ### Kmeans clustering (k=2)
 
