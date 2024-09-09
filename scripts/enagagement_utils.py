@@ -6,6 +6,8 @@ from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
 
+logging.basicConfig(level=logging.INFO)
+
 def normalize_data(df: pd.DataFrame) -> np.ndarray | None:
     try:
         
