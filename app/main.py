@@ -1,12 +1,8 @@
 from utils import StreamlitAPP
 
-import os, sys
-from pathlib import Path
-
-current_directory = Path(__file__).parent
-top_10_handset_path = str(current_directory) + '\\dashboard_data\\top_10_handsets.pkl'
-avearge_engagement_metric_path = str(current_directory) + '\\dashboard_data\\average_engagement.pkl'
-top_10_satisfied_path = str(current_directory) + '\\dashboard_data\\top_10_satisfied.pkl'
+top_10_handset_path ='./app/dashboard_data/top_10_handsets.pkl'
+avearge_engagement_metric_path = './app/dashboard_data/average_engagement.pkl'
+top_10_satisfied_path = './app/dashboard_data/top_10_satisfied.pkl'
 
 if __name__ == '__main__':
     app = StreamlitAPP()
