@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class StreamlitAPP:
     def __init__(self) -> None:
         self.parent_dir = os.getcwd()
-        st.title("Telecom Data Analysis for TellCo.")
+        st.title("Telecom Data Analysis for TellCo. Done by Mekbib Abiro")
         logger.info("StreamlitApp instance initialized successfully")
 
     def load_dataframe(self, picke_path: str) -> pd.DataFrame:
