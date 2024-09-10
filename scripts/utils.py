@@ -5,6 +5,9 @@ import psycopg2
 from psycopg2.extensions import connection as Connection
 import pandas as pd
 
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine as AlchemyConnection
+
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -59,3 +62,42 @@ def close_database_connection(conn: Connection) -> None:
         logging.info("Database connection closed successfully")
     except Exception as e:
         logging.error(f"Error closing database connection: {str(e)}")
+
+def create_alchemy_connection(credentials: dict) -> AlchemyConnection | None:
+    try:
+        username = credentials.get('USER')
+        host = credentials.get('host')
+        port = credentials.get('port')
+        db = credentials.get('DB_NAME')
+
+        engine = create_engine(f'postgresql://{username}:@{host}:{port}/{db}')
+        logging.info(f"Created SQLAlchemy connection")
+        return engine
+
+    except Exception as e:
+        logging.error(f"Error creating SQLAlchemy connection: {str(e)}")
+        return None
+
+def export_df_to_db(df: pd.DataFrame, 
+                    table_name: str,
+                    conn: AlchemyConnection,
+                    if_exists: str = 'fail' # Options are 'fail', 'replace', 'append'
+                    ) -> bool | None:
+    try:
+        # Check if table exists in the database
+        table_exists = conn.dialect.has_table(conn.connect(), table_name)
+        
+        if table_exists and if_exists == 'fail':
+            raise ValueError(f"Table '{table_name}' already exists and 'if_exists' is set to 'fail'. Operation aborted.")
+        
+        # Export df to sql
+        df.to_sql(table_name, con=conn, if_exists=if_exists, index=False)
+        logging.info(f"DataFrame exported to table '{table_name}' successfully.")
+        return True
+    
+    except ValueError as e:
+        logging.error(f'{e}')
+        return None
+    except Exception as e:
+        logging.error(f"Error exporting DataFrame to table '{table_name}': {str(e)}")
+        return None
